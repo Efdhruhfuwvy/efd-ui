@@ -1,0 +1,22 @@
+{
+  "name": "efd-ui",
+  "version": "1.0.0",
+  "description": "",
+  "exports": {
+    "./appLayout": "./src/AppLayout.svelte",
+    "./panedView": "./src/PanedView.svelte",
+    "./titleBar": "./src/TitleBar.svelte",
+    "./menu": "./src/Menu.svelte"
+  },
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "packageManager": "pnpm@10.23.0",
+  "dependencies": {
+    "svelte": "^5.43.14"
+  },
+  "devDependencies": {
+    "prettier-plugin-svelte": "^3.4.0"
+  }
+}
