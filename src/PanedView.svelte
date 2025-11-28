@@ -118,7 +118,7 @@
     class="paned-view-resizer paned-view-vertical-resizer"
     onmousedown={(event) => {
       const offsetY = event.offsetY;
-      const parent = event.currentTarget.parentElement;
+      const parent = event.currentTarget.parentElement!;
 
       function resize(event: MouseEvent) {
         topSize = event.y - parent.getBoundingClientRect().top - offsetY;
@@ -138,7 +138,7 @@
     class="paned-view-resizer paned-view-horizontal-resizer"
     onmousedown={(event) => {
       const offsetX = event.offsetX;
-      const parent = event.currentTarget.parentElement;
+      const parent = event.currentTarget.parentElement!;
 
       function resize(event: MouseEvent) {
         rightSize = parent.getBoundingClientRect().right - event.x - offsetX;
@@ -158,7 +158,7 @@
     class="paned-view-resizer paned-view-vertical-resizer"
     onmousedown={(event) => {
       const offsetY = event.offsetY;
-      const parent = event.currentTarget.parentElement;
+      const parent = event.currentTarget.parentElement!;
 
       function resize(event: MouseEvent) {
         bottomSize = parent.getBoundingClientRect().bottom - event.y - offsetY;
@@ -178,7 +178,7 @@
     class="paned-view-resizer paned-view-horizontal-resizer"
     onmousedown={(event) => {
       const offsetX = event.offsetX;
-      const parent = event.currentTarget.parentElement;
+      const parent = event.currentTarget.parentElement!;
 
       function resize(event: MouseEvent) {
         leftSize = event.x - parent.getBoundingClientRect().left - offsetX;
@@ -199,7 +199,7 @@
     onmousedown={(event) => {
       const offsetX = event.offsetX;
       const offsetY = event.offsetY;
-      const parent = event.currentTarget.parentElement;
+      const parent = event.currentTarget.parentElement!;
 
       function resize(event: MouseEvent) {
         topSize = event.y - parent.getBoundingClientRect().top - offsetY;
@@ -221,7 +221,7 @@
     onmousedown={(event) => {
       const offsetX = event.offsetX;
       const offsetY = event.offsetY;
-      const parent = event.currentTarget.parentElement;
+      const parent = event.currentTarget.parentElement!;
 
       function resize(event: MouseEvent) {
         topSize = event.y - parent.getBoundingClientRect().top - offsetY;
@@ -243,7 +243,7 @@
     onmousedown={(event) => {
       const offsetX = event.offsetX;
       const offsetY = event.offsetY;
-      const parent = event.currentTarget.parentElement;
+      const parent = event.currentTarget.parentElement!;
 
       function resize(event: MouseEvent) {
         rightSize = parent.getBoundingClientRect().right - event.x - offsetX;
@@ -265,7 +265,7 @@
     onmousedown={(event) => {
       const offsetX = event.offsetX;
       const offsetY = event.offsetY;
-      const parent = event.currentTarget.parentElement;
+      const parent = event.currentTarget.parentElement!;
 
       function resize(event: MouseEvent) {
         bottomSize = parent.getBoundingClientRect().bottom - event.y - offsetY;

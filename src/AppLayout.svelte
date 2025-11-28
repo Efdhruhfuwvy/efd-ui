@@ -7,7 +7,7 @@
     statusBar,
     leftNavigationBar,
     rightNavigationBar,
-    titleBarSize = titleBar ? 32 : 0,
+    titleBarSize = titleBar ? 48 : 0,
     statusBarSize = statusBar ? 24 : 0,
     leftNavigationBarSize = leftNavigationBar ? 48 : 0,
     rightNavigationBarSize = rightNavigationBar ? 48 : 0,

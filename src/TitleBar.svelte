@@ -1,73 +1,82 @@
-<script lang="ts" module>
-  declare const api: {
-    setTitleBarOverlay(titleBarOverlay: {
-      height?: number;
-      color?: string;
-      symbolColor?: string;
-    }): void;
-  };
-</script>
-
 <script lang="ts">
   import type { Snippet } from "svelte";
-  import type { HTMLAttributes } from "svelte/elements";
 
   const {
     left,
     center,
     right,
-    ...rest
-  }: HTMLAttributes<HTMLDivElement> & {
+  }: {
     left?: Snippet;
     center?: Snippet;
     right?: Snippet;
   } = $props();
+
+  let desktopEnvironment = $state("");
+  let buttonLayout = $state(":minimize,maximize,close");
+  let maximized = $state(false);
+
+  if (typeof efdUI !== "undefined") {
+    efdUI.getDesktopEnvironment().then((de) => (desktopEnvironment = de));
+    efdUI.getButtonLayout().then((bl) => (buttonLayout = bl));
+    efdUI.onMaximize(() => (maximized = true));
+    efdUI.onUnmaximize(() => (maximized = false));
+  }
 </script>
 
-<div
-  class="title-bar"
-  {...rest}
-  {@attach (titleBar) => {
-    if (typeof api !== "undefined" && "setTitleBarOverlay" in api) {
-      async function updateTitleBarOverlay() {
-        const style = getComputedStyle(titleBar);
-        api.setTitleBarOverlay({
-          height: Math.floor(
-            titleBar.getBoundingClientRect().height * (outerWidth / innerWidth),
-          ),
-          color: style.backgroundColor,
-          symbolColor: style.color,
-        });
-      }
+{#snippet windowControls(side: number)}
+  {#if !navigator.windowControlsOverlay.visible}
+    <div
+      class="title-bar-window-controls"
+      class:title-bar-gnome={desktopEnvironment === "GNOME"}
+      class:title-bar-ubuntu={desktopEnvironment === "ubuntu:GNOME"}
+      class:title-bar-kde={desktopEnvironment === "KDE"}
+      class:title-bar-xfce={desktopEnvironment === "XFCE"}
+      class:title-bar-mate={desktopEnvironment === "MATE"}
+      class:title-bar-lxde={desktopEnvironment === "LXDE" ||
+        desktopEnvironment === "LXQt"}
+      class:title-bar-cinnamon={desktopEnvironment === "Cinnamon"}
+    >
+      {#each buttonLayout.split(":")[side]?.split(",") as button}
+        {#if button === "minimize" || button === "maximize" || button === "close"}
+          <!-- svelte-ignore a11y_consider_explicit_label -->
+          <button
+            class="title-bar-{button === 'maximize'
+              ? maximized
+                ? 'unmaximize'
+                : 'maximize'
+              : button}"
+            tabindex={-1}
+            onclick={() => {
+              if (button === "minimize") {
+                efdUI.minimize();
+              } else if (button === "maximize") {
+                if (maximized) {
+                  efdUI.unmaximize();
+                } else {
+                  efdUI.maximize();
+                }
+              } else if (button === "close") {
+                efdUI.close();
+              }
+            }}
+          ></button>
+        {/if}
+      {/each}
+    </div>
+  {/if}
+{/snippet}
 
-      addEventListener("resize", () => setTimeout(updateTitleBarOverlay));
-      matchMedia("(prefers-color-scheme: dark)").addEventListener(
-        "change",
-        updateTitleBarOverlay,
-      );
-      new MutationObserver(updateTitleBarOverlay).observe(
-        document.documentElement,
-        {
-          childList: true,
-          attributes: true,
-          subtree: true,
-        },
-      );
-      titleBar.addEventListener("transitionend", updateTitleBarOverlay);
-      titleBar.addEventListener("animationend", updateTitleBarOverlay);
-
-      updateTitleBarOverlay();
-    }
-  }}
->
-  <div class="left">
+<div class="title-bar">
+  <div class="title-bar-left">
+    {@render windowControls(0)}
     {@render left?.()}
   </div>
-  <div class="center">
+  <div class="title-bar-center">
     {@render center?.()}
   </div>
-  <div class="right">
+  <div class="title-bar-right">
     {@render right?.()}
+    {@render windowControls(1)}
   </div>
 </div>
 
@@ -81,7 +90,7 @@
       app-region: no-drag;
     }
 
-    & .left {
+    & > .title-bar-left {
       flex: 1;
       align-self: stretch;
       display: flex;
@@ -89,13 +98,13 @@
       padding-left: env(titlebar-area-x);
     }
 
-    & .center {
+    & > .title-bar-center {
       align-self: stretch;
       display: flex;
       align-items: center;
     }
 
-    & .right {
+    & > .title-bar-right {
       flex: 1;
       align-self: stretch;
       display: flex;
@@ -104,6 +113,248 @@
       padding-right: calc(
         100vw - env(titlebar-area-x) - env(titlebar-area-width)
       );
+    }
+
+    & > :is(.title-bar-left, .title-bar-right) > .title-bar-window-controls {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 12px;
+
+      & > button {
+        position: relative;
+        width: 24px;
+        height: 24px;
+        border: none;
+        border-radius: 50%;
+        background: none;
+        color: inherit;
+
+        &:hover {
+          background: #80808020;
+        }
+
+        &:active {
+          background: #80808040;
+        }
+
+        &.title-bar-minimize::after {
+          mask-image: url("images/title-bar/generic-minimize.svg");
+        }
+
+        &.title-bar-maximize::after {
+          mask-image: url("images/title-bar/generic-maximize.svg");
+        }
+
+        &.title-bar-unmaximize::after {
+          mask-image: url("images/title-bar/generic-unmaximize.svg");
+        }
+
+        &.title-bar-close::after {
+          mask-image: url("images/title-bar/generic-close.svg");
+        }
+
+        &::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background: currentColor;
+          mask-size: 100%;
+        }
+      }
+
+      &.title-bar-gnome > button {
+        background: light-dark(#3d3d3d1a, #f7f7f71a);
+
+        &:hover {
+          background: light-dark(#19191926, #f4f4f426);
+        }
+
+        &:active {
+          background: light-dark(#0a0a0a40, #eaeaea40);
+        }
+
+        &.title-bar-minimize::after {
+          mask-image: url("images/title-bar/gnome-minimize.svg");
+        }
+
+        &.title-bar-maximize::after {
+          mask-image: url("images/title-bar/gnome-maximize.svg");
+        }
+
+        &.title-bar-unmaximize::after {
+          mask-image: url("images/title-bar/gnome-unmaximize.svg");
+        }
+
+        &.title-bar-close::after {
+          mask-image: url("images/title-bar/gnome-close.svg");
+        }
+
+        &::after {
+          mask-position: center;
+          mask-size: 16px;
+          mask-repeat: no-repeat;
+        }
+      }
+
+      &.title-bar-ubuntu > button {
+        width: 24px;
+        height: 24px;
+        background: light-dark(#3d3d3d1a, #f7f7f71a);
+
+        &:hover {
+          background: light-dark(#19191926, #f4f4f426);
+        }
+
+        &:active {
+          background: light-dark(#0a0a0a40, #eaeaea40);
+        }
+
+        &.title-bar-minimize::after {
+          mask-image: url("images/title-bar/ubuntu-minimize.svg");
+        }
+
+        &.title-bar-maximize::after {
+          mask-image: url("images/title-bar/ubuntu-maximize.svg");
+        }
+
+        &.title-bar-unmaximize::after {
+          mask-image: url("images/title-bar/ubuntu-unmaximize.svg");
+        }
+
+        &.title-bar-close::after {
+          mask-image: url("images/title-bar/ubuntu-close.svg");
+        }
+
+        &::after {
+          mask-position: center;
+          mask-size: 16px;
+          mask-repeat: no-repeat;
+        }
+      }
+
+      &.title-bar-kde > button {
+        width: 18px;
+        height: 18px;
+
+        &:is(:hover, :active) {
+          background: none;
+        }
+
+        &.title-bar-minimize {
+          &:hover::after {
+            mask-image: url("images/title-bar/kde-minimize-hover.svg");
+          }
+
+          &:active::after {
+            mask-image: url("images/title-bar/kde-minimize-active.svg");
+          }
+
+          &::after {
+            mask-image: url("images/title-bar/kde-minimize.svg");
+          }
+        }
+
+        &.title-bar-maximize {
+          &:hover::after {
+            mask-image: url("images/title-bar/kde-maximize-hover.svg");
+          }
+
+          &:active::after {
+            mask-image: url("images/title-bar/kde-maximize-active.svg");
+          }
+
+          &::after {
+            mask-image: url("images/title-bar/kde-maximize.svg");
+          }
+        }
+
+        &.title-bar-unmaximize {
+          &:hover::after {
+            mask-image: url("images/title-bar/kde-unmaximize-hover.svg");
+          }
+
+          &:active::after {
+            mask-image: url("images/title-bar/kde-unmaximize-active.svg");
+          }
+
+          &::after {
+            mask-image: url("images/title-bar/kde-unmaximize.svg");
+          }
+        }
+
+        &.title-bar-close {
+          &:hover {
+            background: url("images/title-bar/kde-close-hover.svg") center /
+              100%;
+
+            &::after {
+              content: none;
+            }
+          }
+
+          &:active {
+            background: url("images/title-bar/kde-close-active.svg") center /
+              100%;
+
+            &::after {
+              content: none;
+            }
+          }
+
+          &::after {
+            mask-image: url("images/title-bar/kde-close.svg");
+          }
+        }
+      }
+
+      &.title-bar-cinnamon > button {
+        width: 24px;
+        height: 24px;
+
+        &:hover {
+          background: #80808020;
+        }
+
+        &:active {
+          background: #80808040;
+        }
+
+        &.title-bar-minimize::after {
+          mask-image: url("images/title-bar/ubuntu-minimize.svg");
+        }
+
+        &.title-bar-maximize::after {
+          mask-image: url("images/title-bar/ubuntu-maximize.svg");
+        }
+
+        &.title-bar-unmaximize::after {
+          mask-image: url("images/title-bar/ubuntu-unmaximize.svg");
+        }
+
+        &.title-bar-close {
+          background: #249ddd;
+          color: light-dark(#fff, #000);
+
+          &:hover {
+            background: #37a7e2;
+          }
+
+          &:active {
+            background: #228dc7;
+          }
+
+          &::after {
+            mask-image: url("images/title-bar/ubuntu-close.svg");
+          }
+        }
+
+        &::after {
+          mask-position: center;
+          mask-size: 16px;
+          mask-repeat: no-repeat;
+        }
+      }
     }
   }
 </style>
