@@ -75,7 +75,7 @@
         const altKey =
           modifiers.includes("alt") ||
           (isMacOS && modifiers.includes("option"));
-        const eventKey = keys[key.toLowerCase()] ?? key.toLowerCase();
+        const eventKey = keys[key!.toLowerCase()] ?? key!.toLowerCase();
         addEventListener("keydown", (event) => {
           if (
             (item.enabled ?? true) &&
@@ -89,7 +89,7 @@
           }
         });
       } else if (item.type === "submenu" || (!item.type && item.submenu)) {
-        registerAccelerators(item.submenu);
+        registerAccelerators(item.submenu!);
       }
     }
   }
@@ -115,14 +115,14 @@
 
   function onAttach(menu: HTMLDivElement) {
     const isSubmenu =
-      menu.parentElement.parentElement.classList.contains("menu") &&
-      !menu.parentElement.parentElement.classList.contains("menu-bar");
+      menu.parentElement!.parentElement!.classList.contains("menu") &&
+      !menu.parentElement!.parentElement!.classList.contains("menu-bar");
     if (isSubmenu) {
       menu.classList.add("menu-submenu");
     }
     if (!menuBar) {
       const anchor = `--${Math.random().toString(36).slice(2)}`;
-      menu.parentElement.style.setProperty("anchor-name", anchor);
+      menu.parentElement!.style.setProperty("anchor-name", anchor);
       menu.style.setProperty("position-anchor", anchor);
     }
   }
@@ -130,10 +130,10 @@
   function closeMenu() {
     let toClose: HTMLElement = menu;
     while (
-      toClose.parentElement.parentElement.classList.contains("menu") &&
-      !toClose.parentElement.parentElement.classList.contains("menu-bar")
+      toClose.parentElement!.parentElement!.classList.contains("menu") &&
+      !toClose.parentElement!.parentElement!.classList.contains("menu-bar")
     ) {
-      toClose = toClose.parentElement.parentElement;
+      toClose = toClose.parentElement!.parentElement!;
     }
     if (!toClose.classList.contains("menu-bar")) {
       toClose.hidePopover();
@@ -193,13 +193,13 @@
         {@render menuItem(item)}
         <Menu
           {@attach (submenu) => {
-            let hideTimer: number;
-            submenu.parentElement.addEventListener("click", () => {
+            let hideTimer: NodeJS.Timeout;
+            submenu.parentElement!.addEventListener("click", () => {
               if (!submenu.checkVisibility()) {
                 submenu.showPopover();
               }
             });
-            submenu.parentElement.addEventListener("mouseenter", () => {
+            submenu.parentElement!.addEventListener("mouseenter", () => {
               clearTimeout(hideTimer);
               if (
                 !menuBar ||
@@ -207,25 +207,25 @@
                   (element) =>
                     element !== submenu &&
                     element.classList.contains("menu-item-submenu") &&
-                    element.lastElementChild.checkVisibility(),
+                    element.lastElementChild!.checkVisibility(),
                 )
               ) {
                 submenu.showPopover();
               }
             });
-            submenu.parentElement.addEventListener(
+            submenu.parentElement!.addEventListener(
               "mouseleave",
               () => (hideTimer = setTimeout(() => submenu.hidePopover(), 500)),
             );
           }}
-          template={item.submenu}
+          template={item.submenu!}
         />
       </button>
     {:else if item.type === "checkbox"}
       <label class="menu-item menu-item-checkbox">
         <input
           type="checkbox"
-          bind:checked={template[i].checked}
+          bind:checked={template[i]!.checked}
           onclick={(event) => {
             closeMenu();
             item.click?.({ ...event, triggeredByAccelerator: false });

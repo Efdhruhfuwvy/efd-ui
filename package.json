@@ -5,6 +5,7 @@
   "type": "module",
   "exports": {
     "./appLayout": "./src/AppLayout.svelte",
+    "./titleBarView": "./src/TitleBarView.svelte",
     "./panedView": "./src/PanedView.svelte",
     "./titleBar": "./src/TitleBar.svelte",
     "./menu": "./src/Menu.svelte",

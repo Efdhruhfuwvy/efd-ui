@@ -5,10 +5,14 @@
     left,
     center,
     right,
+    leftWindowControls = true,
+    rightWindowControls = true,
   }: {
     left?: Snippet;
     center?: Snippet;
     right?: Snippet;
+    leftWindowControls?: boolean;
+    rightWindowControls?: boolean;
   } = $props();
 
   let desktopEnvironment = $state("");
@@ -68,7 +72,9 @@
 
 <div class="title-bar">
   <div class="title-bar-left">
-    {@render windowControls(0)}
+    {#if leftWindowControls}
+      {@render windowControls(0)}
+    {/if}
     {@render left?.()}
   </div>
   <div class="title-bar-center">
@@ -76,7 +82,9 @@
   </div>
   <div class="title-bar-right">
     {@render right?.()}
-    {@render windowControls(1)}
+    {#if rightWindowControls}
+      {@render windowControls(1)}
+    {/if}
   </div>
 </div>
 
