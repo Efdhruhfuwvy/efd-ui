@@ -31,8 +31,8 @@
     rightSize?: number;
     bottomSize?: number;
     leftSize?: number;
-    minContentWidth: number;
-    minContentHeight: number;
+    minContentWidth?: number;
+    minContentHeight?: number;
     minTopSize?: number;
     minRightSize?: number;
     minBottomSize?: number;
