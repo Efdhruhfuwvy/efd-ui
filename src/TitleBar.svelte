@@ -103,7 +103,7 @@
       align-self: stretch;
       display: flex;
       align-items: center;
-      padding-left: env(titlebar-area-x);
+      padding-inline-start: env(titlebar-area-x);
     }
 
     & > .title-bar-center {
@@ -118,7 +118,7 @@
       display: flex;
       align-items: center;
       justify-content: end;
-      padding-right: calc(
+      padding-inline-end: calc(
         100vw - env(titlebar-area-x) - env(titlebar-area-width)
       );
     }
@@ -130,6 +130,7 @@
       margin: 12px;
 
       & > button {
+        display: grid;
         position: relative;
         width: 24px;
         height: 24px;
@@ -164,8 +165,6 @@
 
         &::after {
           content: "";
-          position: absolute;
-          inset: 0;
           background: currentColor;
           mask-size: 100%;
         }
@@ -241,77 +240,86 @@
         }
       }
 
-      &.title-bar-kde > button {
-        width: 18px;
-        height: 18px;
+      &.title-bar-kde {
+        gap: 0;
+        margin: 0;
 
-        &:is(:hover, :active) {
-          background: none;
-        }
+        & > button {
+          box-sizing: content-box;
+          width: 18px;
+          height: 18px;
+          padding-block: calc((100% - 18px) / 2);
+          padding-inline: 12px;
+          border-radius: 0;
 
-        &.title-bar-minimize {
-          &:hover::after {
-            mask-image: url("images/title-bar/kde-minimize-hover.svg");
+          &:is(:hover, :active) {
+            background: none;
           }
 
-          &:active::after {
-            mask-image: url("images/title-bar/kde-minimize-active.svg");
-          }
+          &.title-bar-minimize {
+            &:hover::after {
+              mask-image: url("images/title-bar/kde-minimize-hover.svg");
+            }
 
-          &::after {
-            mask-image: url("images/title-bar/kde-minimize.svg");
-          }
-        }
-
-        &.title-bar-maximize {
-          &:hover::after {
-            mask-image: url("images/title-bar/kde-maximize-hover.svg");
-          }
-
-          &:active::after {
-            mask-image: url("images/title-bar/kde-maximize-active.svg");
-          }
-
-          &::after {
-            mask-image: url("images/title-bar/kde-maximize.svg");
-          }
-        }
-
-        &.title-bar-unmaximize {
-          &:hover::after {
-            mask-image: url("images/title-bar/kde-unmaximize-hover.svg");
-          }
-
-          &:active::after {
-            mask-image: url("images/title-bar/kde-unmaximize-active.svg");
-          }
-
-          &::after {
-            mask-image: url("images/title-bar/kde-unmaximize.svg");
-          }
-        }
-
-        &.title-bar-close {
-          &:hover {
-            background: url("images/title-bar/kde-close-hover.svg") center /
-              100%;
+            &:active::after {
+              mask-image: url("images/title-bar/kde-minimize-active.svg");
+            }
 
             &::after {
-              content: none;
+              mask-image: url("images/title-bar/kde-minimize.svg");
             }
           }
 
-          &:active {
-            background: url("images/title-bar/kde-close-active.svg") center /
-              100%;
+          &.title-bar-maximize {
+            &:hover::after {
+              mask-image: url("images/title-bar/kde-maximize-hover.svg");
+            }
+
+            &:active::after {
+              mask-image: url("images/title-bar/kde-maximize-active.svg");
+            }
 
             &::after {
-              content: none;
+              mask-image: url("images/title-bar/kde-maximize.svg");
             }
           }
 
-          &::after {
-            mask-image: url("images/title-bar/kde-close.svg");
+          &.title-bar-unmaximize {
+            &:hover::after {
+              mask-image: url("images/title-bar/kde-unmaximize-hover.svg");
+            }
+
+            &:active::after {
+              mask-image: url("images/title-bar/kde-unmaximize-active.svg");
+            }
+
+            &::after {
+              mask-image: url("images/title-bar/kde-unmaximize.svg");
+            }
+          }
+
+          &.title-bar-close {
+            &:hover {
+              background: url("images/title-bar/kde-close-hover.svg") center /
+                100% content-box;
+
+              &::after {
+                content: none;
+              }
+            }
+
+            &:active {
+              background: url("images/title-bar/kde-close-active.svg") center /
+                100% content-box;
+
+              &::after {
+                content: none;
+              }
+            }
+
+            &::after {
+              mask-image: url("images/title-bar/kde-close.svg");
+            }
           }
         }
       }
